@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getAllPokemon, getPokemon } from './services/pokemon'
 import Card from './components/Card'
 import Navbar from './Navbar'
@@ -16,7 +16,7 @@ function App() {
       let response = await getAllPokemon(initialUrl);
       setNextUrl(response.next);
       setPrevUrl(response.previous);
-      let pokemon = await loadingPokemon(response.results)
+      await loadingPokemon(response.results)
       setLoading(false);
     }
     fetchData();
@@ -50,29 +50,29 @@ function App() {
     setPokemonData(_pokemonData)
   }
   return (
-  <div>
-    {
-      loading ? <h1>Loading...</h1> : (
-        <>
-          <Navbar />
-          <div className="btn">
-            <button onClick={prev}>Prev</button>
-            <button onClick={next}>Next</button>
-          </div>
-          <div className="grid-container">
-            {PokemonData.map((pokemon, i) => {
-              return <Card key={i} pokemon={pokemon}/>
-            })}
-          </div>
-          <div className="btn">
-            <button onClick={prev}>Prev</button>
-            <button onClick={next}>Next</button>
-          </div>
-        </>
-      )
-    }
-  </div>
-  )
+    <>
+      <Navbar />
+      <div>
+        {loading ? <h1 style={{ textAlign: 'center' }}>Loading...</h1> : (
+          <>
+            <div className="btn">
+              <button onClick={prev}>Prev</button>
+              <button onClick={next}>Next</button>
+            </div>
+            <div className="grid-container">
+              {PokemonData.map((pokemon, i) => {
+                return <Card key={i} pokemon={pokemon} />
+              })}
+            </div>
+            <div className="btn">
+              <button onClick={prev}>Prev</button>
+              <button onClick={next}>Next</button>
+            </div>
+          </>
+        )}
+      </div>
+    </>
+  );
 }
 
 export default App;
