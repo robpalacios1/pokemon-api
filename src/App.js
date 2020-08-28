@@ -1,26 +1,49 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect, Fragment } from 'react';
+import { getAllPokemon, getPokemon } from './services/pokemon'
+import Card from './components/Card'
 import './App.css';
 
 function App() {
+  const [PokemonData, setPokemonData] = useState([]);
+  const [nextUrl, setNextUrl] = useState('');
+  const [prevUrl, setPrevUrl] = useState('');
+  const [loading, setLoading] = useState(true);
+  const initialUrl = 'https://pokeapi.co/api/v2/pokemon'
+
+  useEffect(() => {
+    async function fetchData() {
+      let response = await getAllPokemon(initialUrl);
+      setNextUrl(response.next);
+      setPrevUrl(response.previous);
+      let pokemon = await loadingPokemon(response.results)
+      setLoading(false);
+    }
+    fetchData();
+  }, [])
+
+  const loadingPokemon = async (data) => {
+    let _pokemonData = await Promise.all(data.map(async pokemon => {
+      let pokemonRecord = await getPokemon(pokemon.url);
+      return pokemonRecord
+    }))
+
+    setPokemonData(_pokemonData)
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  <div>
+    {
+      loading ? <h1>Loading...</h1> : (
+        <>
+          <div className="grid-container">
+            {PokemonData.map((pokemon, i) => {
+              return <Card key={i} pokemon={pokemon}/>
+            })}
+          </div>
+        </>
+      )
+    }
+  </div>
+  )
 }
 
 export default App;
